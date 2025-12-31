@@ -5,6 +5,7 @@ import tkinter as tk
 
 # ================= CONFIG =================
 MINUTOS_ANTES = 5
+INTERVALO_VERIFICACAO = 15000  # 15 segundos
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ARQUIVO_TAREFAS = os.path.join(BASE_DIR, "tarefas.json")
@@ -17,13 +18,12 @@ ACCENT = "#6264A7"
 # ================= ROOT OCULTO =================
 root = tk.Tk()
 root.withdraw()
-root.attributes("-topmost", True)
 
 # ================= POPUP =================
 def popup_lembrete(titulo, pauta=""):
-    popup = tk.Toplevel(root)
+    popup = tk.Toplevel(janela)
     popup.title("AgendaDesk • Lembrete")
-    popup.configure(bg=BG)
+    popup.configure(bg=CARD)
     popup.resizable(False, False)
 
     largura, altura = 420, 260
@@ -37,13 +37,13 @@ def popup_lembrete(titulo, pauta=""):
         pass
 
     popup.attributes("-topmost", True)
+    popup.lift()
     popup.focus_force()
-    popup.grab_set()
 
     tk.Label(
         popup,
         text="⏰ Lembrete de Tarefa",
-        bg=BG,
+        bg=CARD,
         fg=TEXT,
         font=("Segoe UI", 14, "bold")
     ).pack(pady=(20, 10))
@@ -51,7 +51,7 @@ def popup_lembrete(titulo, pauta=""):
     tk.Label(
         popup,
         text=titulo,
-        bg=BG,
+        bg=CARD,
         fg=TEXT,
         wraplength=380,
         font=("Segoe UI", 11, "bold")
@@ -61,7 +61,7 @@ def popup_lembrete(titulo, pauta=""):
         tk.Label(
             popup,
             text=pauta,
-            bg=BG,
+            bg=CARD,
             fg="#d0d0d0",
             wraplength=380,
             justify="left",
@@ -79,58 +79,37 @@ def popup_lembrete(titulo, pauta=""):
 
 # ================= VERIFICAÇÃO =================
 def verificar_lembretes():
-    try:
-        if not os.path.exists(ARQUIVO_TAREFAS):
-            print("Arquivo de tarefas não encontrado")
-            root.after(15000, verificar_lembretes)
-            return
+    agora = datetime.now()
+    alterado = False
 
-        with open(ARQUIVO_TAREFAS, "r", encoding="utf-8") as f:
-            tarefas = json.load(f)
+    for tarefa in tarefas:
+        if tarefa.get("concluida"):
+            continue
 
-        agora = datetime.now()
-        alterado = False
+        if tarefa.get("notificado"):
+            continue
 
-        for tarefa in tarefas:
-            if tarefa.get("concluida"):
-                continue
+        try:
+            data_hora = datetime.strptime(
+                tarefa["data_hora"], "%d/%m/%Y %H:%M"
+            )
+        except:
+            continue
 
-            if tarefa.get("notificado"):
-                continue
+        alerta = data_hora - timedelta(minutes=MINUTOS_ANTES)
 
-            data = tarefa.get("data")
-            hora = tarefa.get("hora")
+        if alerta <= agora <= data_hora:
+            popup_lembrete(
+                tarefa.get("descricao", "Tarefa"),
+                tarefa.get("pauta", "")
+            )
+            tarefa["notificado"] = True
+            alterado = True
 
-            if not data or not hora:
-                continue
+    if alterado:
+        salvar_tarefas()
 
-            try:
-                data_hora = datetime.strptime(
-                    f"{data} {hora}", "%d/%m/%Y %H:%M"
-                )
-            except Exception as e:
-                print("Erro ao converter data:", e)
-                continue
-
-            alerta = data_hora - timedelta(minutes=MINUTOS_ANTES)
-
-            if alerta <= agora <= alerta + timedelta(minutes=2):
-                print("⏰ Disparando lembrete:", tarefa.get("descricao"))
-                popup_lembrete(
-                    tarefa.get("descricao", "Tarefa"),
-                    tarefa.get("pauta", "")
-                )
-                tarefa["notificado"] = True
-                alterado = True
-
-        if alterado:
-            with open(ARQUIVO_TAREFAS, "w", encoding="utf-8") as f:
-                json.dump(tarefas, f, ensure_ascii=False, indent=2)
-
-    except Exception as e:
-        print("Erro no lembrete:", e)
-
-    root.after(15000, verificar_lembretes)
+    janela.after(15000, verificar_lembretes)
 
 # ================= START =================
 print("AgendaDesk • Lembretes ativos")

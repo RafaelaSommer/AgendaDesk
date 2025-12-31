@@ -1,9 +1,10 @@
 [
   {
     "descricao": "Reunião",
-    "pauta": "Reunião de alinhamento",
-    "data_hora": "31/12/2025 10:40",
+    "pauta": "reunião de alinhamento",
+    "data_hora": "31/12/2025 11:05",
     "concluida": false,
     "notificado": false
+
   }
 ]
