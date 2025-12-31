@@ -72,6 +72,7 @@ Contém os ícones e imagens utilizadas na aplicação.
 ▶️ Como Executar o Projeto
 1️⃣ Clone o repositório
 git clone https://github.com/seu-usuario/agendadesk.git
+
 cd agendadesk
 
 2️⃣ Instale as dependências
