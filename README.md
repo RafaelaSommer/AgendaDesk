@@ -1,8 +1,9 @@
 📅 AgendaDesk
 Sua agenda desktop simples, elegante e eficiente
 
-AgendaDesk é uma aplicação desktop em Python criada para quem busca organização, produtividade e praticidade no dia a dia.
-Com ela, você gerencia tarefas, compromissos e pautas de conteúdo em um só lugar — com lembretes automáticos, dark mode e funcionamento em segundo plano.
+AgendaDesk é uma aplicação desktop desenvolvida em Python para quem busca organização, produtividade e praticidade no dia a dia.
+
+Com ela, você pode gerenciar tarefas, compromissos e pautas de conteúdo em um único lugar — contando com lembretes automáticos, modo escuro (Dark Mode) e execução em segundo plano.
 
 Ideal para estudantes, profissionais, criadores de conteúdo e qualquer pessoa que precise manter a rotina sob controle. ✅
 
@@ -78,7 +79,9 @@ python lembrete_background.py
 
 💡 Dica: o lembrete_background.py pode ser configurado para iniciar automaticamente junto com o sistema operacional.
 
-🔔 Como Funcionam os Lembretes
+---
+
+### 🔔 Como Funcionam os Lembretes
 
 Baseados nas tarefas salvas no tarefas.json
 
@@ -88,17 +91,19 @@ Verificação periódica de horários
 
 Exibição de pop-ups centralizados na tela
 
-🎯 Objetivo do Projeto
+---
+
+### 🎯 Objetivo do Projeto
 
 O AgendaDesk foi criado para facilitar a organização pessoal e profissional, oferecendo uma solução desktop prática, leve e eficiente para:
 
-Estudos 📚
+📚 Estudos
 
-Trabalho 💼
+💼 Trabalho
 
-Produção de conteúdo 🎥
+🎥 Produção de conteúdo
 
-Rotinas diárias 📆
+📆 Rotinas diárias
 
 🚀 Possíveis Melhorias Futuras
 
@@ -115,4 +120,4 @@ Rotinas diárias 📆
 💙 Contribuições
 
 Sinta-se à vontade para abrir issues, sugerir melhorias ou contribuir com o projeto.
-Toda ajuda é bem-vinda! 😊
+Toda ajuda é muito bem-vinda! 😊

@@ -16,7 +16,8 @@ ACCENT = "#6264A7"
 
 # ================= ROOT OCULTO =================
 root = tk.Tk()
-root.withdraw()  # não mostra janela principal
+root.withdraw()
+root.attributes("-topmost", True)
 
 # ================= POPUP =================
 def popup_lembrete(titulo, pauta=""):
@@ -37,6 +38,7 @@ def popup_lembrete(titulo, pauta=""):
 
     popup.attributes("-topmost", True)
     popup.focus_force()
+    popup.grab_set()
 
     tk.Label(
         popup,
@@ -79,6 +81,7 @@ def popup_lembrete(titulo, pauta=""):
 def verificar_lembretes():
     try:
         if not os.path.exists(ARQUIVO_TAREFAS):
+            print("Arquivo de tarefas não encontrado")
             root.after(15000, verificar_lembretes)
             return
 
@@ -95,18 +98,24 @@ def verificar_lembretes():
             if tarefa.get("notificado"):
                 continue
 
+            data = tarefa.get("data")
+            hora = tarefa.get("hora")
+
+            if not data or not hora:
+                continue
+
             try:
-                data_str, hora_str = tarefa["data_hora"].rsplit(" ", 1)
                 data_hora = datetime.strptime(
-                    f"{data_str} {hora_str}", "%d/%m/%Y %H:%M"
+                    f"{data} {hora}", "%d/%m/%Y %H:%M"
                 )
-            except:
+            except Exception as e:
+                print("Erro ao converter data:", e)
                 continue
 
             alerta = data_hora - timedelta(minutes=MINUTOS_ANTES)
 
-            # janela de 2 minutos para garantir o disparo
             if alerta <= agora <= alerta + timedelta(minutes=2):
+                print("⏰ Disparando lembrete:", tarefa.get("descricao"))
                 popup_lembrete(
                     tarefa.get("descricao", "Tarefa"),
                     tarefa.get("pauta", "")
@@ -121,7 +130,6 @@ def verificar_lembretes():
     except Exception as e:
         print("Erro no lembrete:", e)
 
-    # verifica novamente a cada 15 segundos
     root.after(15000, verificar_lembretes)
 
 # ================= START =================
