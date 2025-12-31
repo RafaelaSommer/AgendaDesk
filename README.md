@@ -35,6 +35,8 @@ Threading – Execução de lembretes em segundo plano
 
 ---
 
+### 📂 Estrutura do Projeto
+
 AgendaDesk/
 │
 ├── assets/                  # Recursos visuais da aplicação
