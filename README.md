@@ -8,6 +8,8 @@ Com ela, você pode gerenciar tarefas, compromissos e pautas de conteúdo em um 
 
 Ideal para estudantes, profissionais, criadores de conteúdo e qualquer pessoa que precise manter a rotina sob controle. ✅
 
+---
+
 ### ✨ Principais Funcionalidades
 
 ✔️ Cadastro de tarefas com data e hora
