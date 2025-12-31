@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from tkcalendar import Calendar
-from datetime import datetime
+from datetime import datetime, timedelta
 from PIL import Image, ImageTk
 import json
 import os
@@ -10,7 +10,9 @@ import os
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ARQUIVO_TAREFAS = os.path.join(BASE_DIR, "tarefas.json")
 ICON_PATH = os.path.join(BASE_DIR, "assets", "logo.ico")
-LOGO_PATH = os.path.join(BASE_DIR, "assets", "logo.png")
+
+MINUTOS_ANTES = 5
+INTERVALO_VERIFICACAO = 15000  # 15s
 
 # ================= CORES =================
 BG = "#1b1f23"
@@ -26,30 +28,14 @@ indice_edicao = None
 # ================= ARQUIVO =================
 def carregar_tarefas():
     global tarefas
-
     if not os.path.exists(ARQUIVO_TAREFAS):
         tarefas = []
         return
 
     try:
         with open(ARQUIVO_TAREFAS, "r", encoding="utf-8") as f:
-            dados = json.load(f)
-
-        if isinstance(dados, list):
-            tarefas = []
-            for t in dados:
-                tarefas.append({
-                    "descricao": t.get("descricao", ""),
-                    "pauta": t.get("pauta", ""),
-                    "data_hora": t.get("data_hora", ""),
-                    "concluida": t.get("concluida", False),
-                    "notificado": t.get("notificado", False)
-                })
-        else:
-            tarefas = []
-
-    except Exception as e:
-        print("Erro ao carregar tarefas:", e)
+            tarefas = json.load(f)
+    except:
         tarefas = []
 
 def salvar_tarefas():
@@ -109,7 +95,6 @@ def preparar_edicao():
 
 def salvar_edicao():
     global indice_edicao
-
     if indice_edicao is None:
         return
 
@@ -145,16 +130,102 @@ def marcar_concluida(event):
         salvar_tarefas()
         atualizar_lista()
 
+# ================= LEMBRETES =================
+def popup_lembrete(titulo, pauta=""):
+    popup = tk.Toplevel(janela)
+    popup.title("AgendaDesk • Lembrete")
+    popup.configure(bg=CARD)
+    popup.resizable(False, False)
+
+    largura, altura = 420, 260
+    x = (popup.winfo_screenwidth() // 2) - (largura // 2)
+    y = (popup.winfo_screenheight() // 2) - (altura // 2)
+    popup.geometry(f"{largura}x{altura}+{x}+{y}")
+
+    try:
+        popup.iconbitmap(ICON_PATH)
+    except:
+        pass
+
+    popup.attributes("-topmost", True)
+    popup.lift()
+    popup.focus_force()
+
+    tk.Label(
+        popup,
+        text="⏰ Lembrete de Tarefa",
+        bg=CARD,
+        fg=TEXT,
+        font=("Segoe UI", 14, "bold")
+    ).pack(pady=(20, 10))
+
+    tk.Label(
+        popup,
+        text=titulo,
+        bg=CARD,
+        fg=TEXT,
+        wraplength=380,
+        font=("Segoe UI", 11, "bold")
+    ).pack(pady=5)
+
+    if pauta:
+        tk.Label(
+            popup,
+            text=pauta,
+            bg=CARD,
+            fg="#d0d0d0",
+            wraplength=380,
+            justify="left",
+            font=("Segoe UI", 10)
+        ).pack(pady=10)
+
+    tk.Button(
+        popup,
+        text="OK",
+        bg=ACCENT,
+        fg="white",
+        width=14,
+        command=popup.destroy
+    ).pack(pady=20)
+
+def verificar_lembretes():
+    agora = datetime.now()
+    alterado = False
+
+    for tarefa in tarefas:
+        if tarefa.get("concluida") or tarefa.get("notificado"):
+            continue
+
+        try:
+            data_hora = datetime.strptime(
+                tarefa["data_hora"], "%d/%m/%Y %H:%M"
+            )
+        except:
+            continue
+
+        alerta = data_hora - timedelta(minutes=MINUTOS_ANTES)
+
+        if alerta <= agora <= data_hora:
+            popup_lembrete(
+                tarefa.get("descricao", "Tarefa"),
+                tarefa.get("pauta", "")
+            )
+            tarefa["notificado"] = True
+            alterado = True
+
+    if alterado:
+        salvar_tarefas()
+
+    janela.after(INTERVALO_VERIFICACAO, verificar_lembretes)
+
 # ================= UI =================
 def atualizar_lista():
     lista.delete(*lista.get_children())
-
     for i, t in enumerate(tarefas):
         status = "Concluída" if t.get("concluida") else "Pendente"
-        lista.insert(
-            "", "end", iid=i,
-            values=(t.get("descricao", ""), status, t.get("data_hora", "")),
-            tags=("done" if t.get("concluida") else "pending",)
+        lista.insert("", "end", iid=i,
+            values=(t["descricao"], status, t["data_hora"]),
+            tags=("done" if t["concluida"] else "pending",)
         )
 
     lista.tag_configure("done", foreground=SUCCESS)
@@ -179,8 +250,7 @@ except:
 # ================= ESTILO =================
 style = ttk.Style()
 style.theme_use("default")
-style.configure(
-    "Treeview",
+style.configure("Treeview",
     background=CARD,
     foreground=TEXT,
     rowheight=34,
@@ -189,34 +259,6 @@ style.configure(
     font=("Segoe UI", 10)
 )
 style.map("Treeview", background=[("selected", ACCENT)])
-
-# ================= HEADER =================
-header = tk.Frame(janela, bg=CARD, height=70)
-header.pack(fill="x")
-
-header_inner = tk.Frame(header, bg=CARD)
-header_inner.pack(side="left", padx=20)
-
-try:
-    img = Image.open(ICON_PATH)
-    img = img.resize((36, 36), Image.LANCZOS)
-    logo = ImageTk.PhotoImage(img)
-
-    lbl_logo = tk.Label(header_inner, image=logo, bg=CARD)
-    lbl_logo.image = logo
-    lbl_logo.pack(side="left", padx=(0, 10))
-except Exception as e:
-    print("Erro ao carregar ico:", e)
-
-
-tk.Label(
-    header_inner,
-    text="AgendaDesk",
-    bg=CARD,
-    fg=TEXT,
-    font=("Segoe UI", 18, "bold")
-).pack(side="left")
-
 
 # ================= CONTEÚDO =================
 conteudo = tk.Frame(janela, bg=BG)
@@ -229,7 +271,7 @@ tk.Label(left, text="Título", bg=BG, fg=TEXT).pack(anchor="w")
 entry_desc = tk.Entry(left, width=40, bg=CARD, fg=TEXT, insertbackground=TEXT)
 entry_desc.pack(pady=6)
 
-tk.Label(left, text="Pauta de Conteúdos", bg=BG, fg=TEXT).pack(anchor="w", pady=(10, 0))
+tk.Label(left, text="Pauta", bg=BG, fg=TEXT).pack(anchor="w")
 text_pauta = tk.Text(left, width=40, height=6, bg=CARD, fg=TEXT, insertbackground=TEXT)
 text_pauta.pack(pady=6)
 
@@ -246,7 +288,6 @@ btn_add.pack(fill="x", pady=10)
 tk.Button(left, text="Editar", bg="#3b3f45", fg=TEXT, command=preparar_edicao).pack(fill="x", pady=4)
 tk.Button(left, text="Excluir", bg=DANGER, fg="white", command=excluir_tarefa).pack(fill="x")
 
-# ================= LISTA =================
 right = tk.Frame(conteudo, bg=BG)
 right.pack(side="right", fill="both", expand=True)
 
@@ -254,15 +295,11 @@ lista = ttk.Treeview(right, columns=("desc", "status", "data"), show="headings")
 lista.heading("desc", text="Título")
 lista.heading("status", text="Status")
 lista.heading("data", text="Data / Hora")
-
-lista.column("desc", width=420)
-lista.column("status", width=120, anchor="center")
-lista.column("data", width=200)
-
 lista.pack(fill="both", expand=True)
 lista.bind("<Double-1>", marcar_concluida)
 
+# ================= START =================
 carregar_tarefas()
 atualizar_lista()
-
+verificar_lembretes()
 janela.mainloop()
