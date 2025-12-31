@@ -1,4 +1,5 @@
-📅 AgendaDesk
+### 📅 AgendaDesk
+
 Sua agenda desktop simples, elegante e eficiente
 
 AgendaDesk é uma aplicação desktop desenvolvida em Python para quem busca organização, produtividade e praticidade no dia a dia.
@@ -7,7 +8,7 @@ Com ela, você pode gerenciar tarefas, compromissos e pautas de conteúdo em um 
 
 Ideal para estudantes, profissionais, criadores de conteúdo e qualquer pessoa que precise manter a rotina sob controle. ✅
 
-✨ Principais Funcionalidades
+### ✨ Principais Funcionalidades
 
 ✔️ Cadastro de tarefas com data e hora
 📝 Campo exclusivo para pauta de conteúdos
@@ -18,7 +19,7 @@ Ideal para estudantes, profissionais, criadores de conteúdo e qualquer pessoa q
 📌 Marcação de tarefas como concluídas
 🖥️ Aplicação desktop leve, simples e intuitiva
 
-🛠️ Tecnologias Utilizadas
+### 🛠️ Tecnologias Utilizadas
 
 Python 3.10+
 
@@ -32,7 +33,8 @@ Pillow (PIL) – Ícones e imagens
 
 Threading – Execução de lembretes em segundo plano
 
-📂 Estrutura do Projeto
+### 📂 Estrutura do Projeto
+
 AgendaDesk/
 │
 ├── assets/
@@ -44,7 +46,7 @@ AgendaDesk/
 ├── lembrete_background.py
 └── README.md
 
-📄 Descrição dos Arquivos
+### 📄 Descrição dos Arquivos
 🖥️ agendadesk.py
 
 Responsável pela interface principal da aplicação.
@@ -58,7 +60,9 @@ Script que roda em segundo plano, verificando os horários das tarefas e exibind
 
 Arquivo onde todas as tarefas são armazenadas localmente.
 
-🎨 assets/
+---
+
+### 🎨 assets/
 
 Contém os ícones e imagens utilizadas na aplicação.
 
