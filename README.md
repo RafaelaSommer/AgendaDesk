@@ -38,15 +38,14 @@ Threading – Execução de lembretes em segundo plano
 ### 📂 Estrutura do Projeto
 
 AgendaDesk/
+├── assets/
+│   ├── logo.png
+│   └── logo.ico
 │
-├── assets/                  # Recursos visuais da aplicação
-│   ├── logo.png              # Logo em PNG
-│   └── logo.ico              # Ícone do aplicativo
-│
-├── tarefas.json              # Armazenamento das tarefas e lembretes
-├── agendadesk.py             # Aplicação principal (interface e gerenciamento)
-├── lembrete_background.py    # Serviço de lembretes em segundo plano
-└── README.md                 # Documentação do projeto
+├── tarefas.json
+├── agendadesk.py
+├── lembrete_background.py
+└── README.md
 
 ### 📄 Descrição dos Arquivos
 🖥️ agendadesk.py
