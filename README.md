@@ -109,7 +109,9 @@ O AgendaDesk foi criado para facilitar a organização pessoal e profissional, o
 
 📆 Rotinas diárias
 
-🚀 Possíveis Melhorias Futuras
+---
+
+### 🚀 Possíveis Melhorias Futuras
 
 🔔 Notificações nativas do sistema
 
@@ -121,7 +123,9 @@ O AgendaDesk foi criado para facilitar a organização pessoal e profissional, o
 
 🗄️ Integração com banco de dados
 
-💙 Contribuições
+---
+
+### 💙 Contribuições
 
 Sinta-se à vontade para abrir issues, sugerir melhorias ou contribuir com o projeto.
 Toda ajuda é muito bem-vinda! 😊
